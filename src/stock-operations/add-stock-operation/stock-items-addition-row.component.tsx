@@ -24,9 +24,9 @@ import {
 import {
   DATE_PICKER_CONTROL_FORMAT,
   DATE_PICKER_FORMAT,
-  URL_STOCK_ITEM,
   formatForDatePicker,
   today,
+  URL_STOCK_ITEM,
 } from "../../constants";
 import { StockBatchDTO } from "../../core/api/types/stockItem/StockBatchDTO";
 import { StockItemPackagingUOMDTO } from "../../core/api/types/stockItem/StockItemPackagingUOM";
@@ -223,38 +223,48 @@ const StockItemsAdditionRow: React.FC<StockItemsAdditionRowProps> = ({
             )}
             {(requiresActualBatchInformation || requiresBatchUuid) && (
               <TableCell>
-                {(canEdit ||
-                  (canUpdateBatchInformation &&
-                    row?.permission?.canUpdateBatchInformation)) &&
-                  requiresActualBatchInformation && (
-                    <DatePicker
-                      id={`expiration-${row.uuid}`}
-                      datePickerType="single"
-                      minDate={formatForDatePicker(today())}
-                      locale="en"
-                      dateFormat={DATE_PICKER_CONTROL_FORMAT}
-                      onChange={([newDate]) => {
-                        setValue(`stockItems.${index}.expiration`, newDate);
-                      }}
-                    >
-                      <DatePickerInput
-                        size="sm"
-                        autoComplete="off"
-                        id={`expiration-input-${row.uuid}`}
-                        name="operationDate"
-                        placeholder={DATE_PICKER_FORMAT}
-                        defaultValue={formatForDatePicker(row?.expiration)}
-                        invalid={!!errors?.stockItems?.[index]?.expiration}
-                      />
-                    </DatePicker>
-                  )}
-                {((!(
-                  canUpdateBatchInformation &&
-                  row?.permission?.canUpdateBatchInformation
-                ) &&
-                  !canEdit) ||
-                  requiresBatchUuid) &&
-                  formatForDatePicker(row.expiration)}
+                {(requiresActualBatchInformation || requiresBatchUuid) && (
+                  <>
+                    {(canEdit ||
+                      (canUpdateBatchInformation &&
+                        row?.permission?.canUpdateBatchInformation)) &&
+                    requiresActualBatchInformation ? (
+                      <DatePicker
+                        id={`expiration-${row.uuid}`}
+                        datePickerType="single"
+                        minDate={formatForDatePicker(today())}
+                        locale="en"
+                        dateFormat={DATE_PICKER_CONTROL_FORMAT}
+                        value={stockItemExpiry || row.expiration}
+                        onChange={([newDate]) => {
+
+                          setValue(`stockItems.${index}.expiration`, newDate);
+                          setStockItemExpiy(newDate);
+                        }}
+                      >
+                        <DatePickerInput
+                          size="sm"
+                          autoComplete="off"
+                          id={`expiration-input-${row.uuid}`}
+                          name="operationDate"
+                          placeholder={DATE_PICKER_FORMAT}
+                          value={
+                            formatForDatePicker(
+                              stockItemExpiry || row.expiration
+                            ) || ""
+                          }
+                          invalid={!!errors?.stockItems?.[index]?.expiration}
+                        />
+                      </DatePicker>
+                    ) : (
+                      <span>
+                        {formatForDatePicker(
+                          stockItemExpiry || row.expiration
+                        ) || ""}
+                      </span>
+                    )}
+                  </>
+                )}
               </TableCell>
             )}
             <TableCell>
